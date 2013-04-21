@@ -24,7 +24,7 @@ import coastlines.CoastLines;
 import util.GCThread;
 
 public class DrawGraph extends JComponent {
-	HashSet<MyEdge> edges;
+	private HashSet<MyEdge> edges;
 	private QuadTree<Double> qt;
 
 	private double upperLeftX = 434168; //The upper left corner in UTM-coordinates
@@ -86,8 +86,6 @@ public class DrawGraph extends JComponent {
 	private double pixelToUTMConverter(double d) {
 		return d * (1000/factor); //Calculates the UTM coordinates instead of pixel coordinates
 	}
-
-
 
 	//Zooms in on the map
 	private void zoom(double upperLeftX2, double upperLeftY2, double utmWidth2, double utmHeight2, boolean zoomIn, double x1utm2, double x2utm2, double y1utm2, double y2utm2) {
@@ -282,9 +280,7 @@ public class DrawGraph extends JComponent {
 			if (SwingUtilities.isLeftMouseButton(e) && !e.isShiftDown()) {
 				x2 = e.getX();
 				y2 = e.getY();
-				upperLeftX -= ((x2-x1)*(75/factor));
-				upperLeftY += ((y2-y1)*(75/factor));
-				zoom(upperLeftX, upperLeftY, utmWidth, utmHeight, false, 0, 0, 0, 0);
+				zoom(upperLeftX-((x2-x1)*(75/factor)), upperLeftY+((y2-y1)*(75/factor)), utmWidth, utmHeight, false, 0, 0, 0, 0);
 			}
 			if(e.isShiftDown()) {
 				x2 = Math.min(e.getX(), x1);

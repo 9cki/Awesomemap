@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 
-
 public class CoastLines extends Thread {
 
 	private static MyUTMPoint[][] utmPoints;
