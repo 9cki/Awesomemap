@@ -1,6 +1,3 @@
-import coastlines.CoastLines;
-import coastlines.MyCoastLines;
-import coastlines.MyUTMPoint;
 import util.GCThread;
 
 import graph.MyGraph;
@@ -12,8 +9,7 @@ public class Driver {
 	public static boolean loading = true;
 
 	public static void main(String[] args) {
-		CoastLines cl = CoastLines.getInstance();
-		cl.start();
+		
 		LoadingThread lt = new LoadingThread();
 		lt.setPriority(Thread.MIN_PRIORITY);
 		lt.start();
@@ -30,16 +26,14 @@ public class Driver {
 				qt.insert(n);
 			}
 			System.out.println("Nodes inserted");
-			nodes = null;
-			mg = null;
+
 			loading = false;
 			lt = null;
 			CreateGUI.getInstance(qt);
 			System.gc();
 			System.out.println("Garbage collection done");
-			System.out.println("Done drawing");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		} 
 	}
 }

@@ -2,6 +2,7 @@ package gui;
 import graph.Interval;
 import graph.MyEdge;
 import graph.MyInterval2D;
+import graph.MyNode;
 import graph.QuadTree;
 
 import java.awt.Color;
@@ -20,7 +21,8 @@ import java.util.HashSet;
 
 import javax.swing.*;
 
-import coastlines.CoastLines;
+import coastlines.MyCoastLines;
+import coastlines.MyUTMPoint;
 import util.GCThread;
 
 public class DrawGraph extends JComponent {
@@ -41,6 +43,8 @@ public class DrawGraph extends JComponent {
 	private boolean dragging; //Is the mouse being dragged? (used for drawing the square)
 	private double rectWidth, rectHeight; //The width and height of the marked square when zooming
 	private double zoomLvl = 100;
+	private MyCoastLines mcl;
+	private MyUTMPoint[][] utmPoints;
 	public static int garbageCollectorFlag = 0;
 
 	//Initializes the DrawGraph class
@@ -53,6 +57,8 @@ public class DrawGraph extends JComponent {
 		addMouseListener(new MyMouseListener());
 		addMouseMotionListener(new MyMouseAdapter());
 		addMouseWheelListener(new MyMouseWheelListener());
+		mcl = new MyCoastLines();
+		utmPoints = mcl.getUTMPoints();
 	}
 
 	public void drawGraph(HashSet<MyEdge> e, double w, double h){
@@ -127,6 +133,8 @@ public class DrawGraph extends JComponent {
 		queryQT(new Interval<Double>(upperLeftX, upperLeftX+utmWidth), new Interval<Double>(upperLeftY, upperLeftY-utmHeight));
 		edges = qt.getEdges();
 		drawGraph(edges, width, height);
+		System.gc();
+		System.out.println("GC called in zoom method in draw graph class");
 		repaint();
 	}
 
@@ -188,9 +196,19 @@ public class DrawGraph extends JComponent {
 					g.draw(new Line2D.Double(fromX, fromY, toX, toY));
 				}
 			}
-			
-		
-			CoastLines.getInstance().paintComponent(g, upperLeftX, upperLeftY, pixelFactor);
+
+			//Draw coastLines	
+			g.setColor(Color.DARK_GRAY);
+			g.setStroke(new BasicStroke(0.8f));
+			for(MyUTMPoint[] utmPointArray : utmPoints) {
+				for(int i = 0; i < utmPointArray.length; i++) {
+					if(utmPointArray[i] != null && utmPointArray[i+1] != null) {
+						g.draw(new Line2D.Double(((utmPointArray[i].getX()-upperLeftX)/pixelFactor), 
+								((upperLeftY-utmPointArray[i].getY())/pixelFactor), ((utmPointArray[i+1].getX()-upperLeftX)/pixelFactor), 
+								((upperLeftY-utmPointArray[i+1].getY())/pixelFactor)));
+					}
+				}
+			}
 
 
 		} catch (Exception e) {
@@ -220,7 +238,6 @@ public class DrawGraph extends JComponent {
 		public void mouseClicked(MouseEvent e) { //Right-clicking the mouse resets the map
 			if(e.getButton() == 3) {
 				resetMap();
-				GCThread.increaseGCFlag(40);
 			}
 			if(e.getClickCount() == 2 && !e.isConsumed()) {
 				e.consume();
@@ -265,7 +282,6 @@ public class DrawGraph extends JComponent {
 			if(e.isShiftDown()) {
 				x2 = e.getX();
 				y2 = e.getY();
-				GCThread.increaseGCFlag(10);
 				zoom();
 			}
 		}
@@ -275,7 +291,7 @@ public class DrawGraph extends JComponent {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {	
-			GCThread.increaseGCFlag(5);	
+			GCThread.increaseGCFlag(2);	
 			if (SwingUtilities.isLeftMouseButton(e) && !e.isShiftDown()) {
 				x2 = e.getX();
 				y2 = e.getY();
@@ -304,7 +320,8 @@ public class DrawGraph extends JComponent {
 		public void mouseWheelMoved(MouseWheelEvent e) {
 			int notches = e.getWheelRotation();
 			//A pixel constant used for setting the interval when only given one point (pixel coordinates of the mouse when scrolling)
-			double pixelConstant = 150;
+			double pixelConstant = 150; 
+
 			if(notches < 0) { //Zoom in
 				if(utmWidth < 1500 || utmHeight < 1500) { //You can't zoom more than this (1500m in either width or height)
 					return;
@@ -314,6 +331,7 @@ public class DrawGraph extends JComponent {
 				x2 = e.getX()+pixelConstant*preferredRatio;
 				y2 = e.getY()-pixelConstant;
 				zoom();
+				GCThread.increaseGCFlag(10);
 			}
 			else { //Zoom out
 				if(utmWidth >= 364790 || utmHeight >= 269423) { //You can't zoom more out than this
@@ -336,8 +354,8 @@ public class DrawGraph extends JComponent {
 				edges = qt.getEdges();
 				drawGraph(edges, getWidth(), getHeight());
 				repaint();
-			}	
-			GCThread.increaseGCFlag(10);
+				GCThread.increaseGCFlag(10);
+			}
 		}
 	}
 }
