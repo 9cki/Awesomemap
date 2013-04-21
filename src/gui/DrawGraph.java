@@ -79,44 +79,58 @@ public class DrawGraph extends JComponent {
 
 	public void calculateZoomLvl() {
 		zoomLvl = ((484790.0/utmWidth*100 >= 379423.0/utmHeight*100)) ? (484790.0/utmWidth*100) : (379423.0/utmHeight*100);
-	
+
 		System.out.println("Zoomlvl: " + zoomLvl);
 	}
 
+	private double pixelToUTMConverter(double d) {
+		return d * (1000/factor); //Calculates the UTM coordinates instead of pixel coordinates
+	}
+
+
 
 	//Zooms in on the map
-	private void zoom() {
-		if(x1 > x2) { //If x1 > x2 then switch
-			double temp = x1;
-			x1 = x2;
-			x2 = temp;
+	private void zoom(double upperLeftX2, double upperLeftY2, double utmWidth2, double utmHeight2, boolean zoomIn, double x1utm2, double x2utm2, double y1utm2, double y2utm2) {
+
+		if(zoomIn) {
+			if(x1utm2 > x2utm2) { //If x1 > x2 then switch
+				double temp = x1utm2;
+				x1utm2 = x2utm2;
+				x2utm2 = temp;
+			}
+			if(y1utm2 > y2utm2) { //If y1 > y1 then switch
+				double temp = y1utm2;
+				y1utm2 = y2utm2;
+				y2utm2 = temp;
+			}
+
+			upperLeftX += x1utm2;
+			upperLeftY -= y1utm2;
+			utmWidth = x2utm2-x1utm2;
+			utmHeight = y2utm2-y1utm2;
+
+			if(utmWidth < 1500 || utmHeight < 1500) { //You can't zoom more than this (1500m in either width or height)
+				x1 = 0; y1 = 0; x2 = 0; y2 = 0;
+				upperLeftX -= x1utm2;
+				upperLeftY += y1utm2;
+				repaint();
+				return;
+			}
 		}
-		if(y1 > y2) { //If y1 > y1 then switch
-			double temp = y1;
-			y1 = y2;
-			y2 = temp;
+		else {
+
+			upperLeftX = upperLeftX2;
+			upperLeftY = upperLeftY2;
+			utmWidth = utmWidth2;
+			utmHeight = utmHeight2;
 		}
 
-		double x1utm = x1 * (1000/factor); //Calculates the UTM coordinates instead of pixel coordinates
-		double x2utm = x2 * (1000/factor); //Calculates the UTM coordinates instead of pixel coordinates
-		double y1utm = y1 * (1000/factor); //Calculates the UTM coordinates instead of pixel coordinates
-		double y2utm = y2 * (1000/factor); //Calculates the UTM coordinates instead of pixel coordinates
-		upperLeftX += x1utm;
-		upperLeftY -= y1utm;
-		utmWidth = x2utm-x1utm;
-		utmHeight = y2utm-y1utm;
-		if(utmWidth < 1500 || utmHeight < 1500) { //You can't zoom more than this (1500m in either width or height)
-			x1 = 0; y1 = 0; x2 = 0; y2 = 0;
-			upperLeftX -= x1utm;
-			upperLeftY += y1utm;
-			repaint();
-			return;
-		}
+
 		if(utmWidth/utmHeight < preferredRatio) {
-			utmWidth = utmHeight * preferredRatio;
+			this.utmWidth = utmHeight * preferredRatio;
 		}
 		else if(utmWidth/utmHeight > preferredRatio) {
-			utmHeight = utmWidth / preferredRatio;
+			this.utmHeight = utmWidth / preferredRatio;
 		}
 		utmWidthRelation = utmWidth/1000;
 		utmHeightRelation = utmHeight/1000;
@@ -132,18 +146,7 @@ public class DrawGraph extends JComponent {
 
 	//Resets the map to the initial state
 	private void resetMap() {
-		zoomLvl = 100;
-		upperLeftX = 434168;
-		upperLeftY = 6412239;
-		utmWidth = 484790.0;
-		utmHeight = 379423.0;
-		utmWidthRelation = utmWidth/1000;
-		utmHeightRelation = utmHeight/1000;
-		calculateFactor();
-		queryQT(new Interval<Double>(upperLeftX, upperLeftX+utmWidth), new Interval<Double>(upperLeftY-utmHeight, upperLeftY));
-		edges = qt.getEdges();
-		drawGraph(edges, getWidth(), getHeight());
-		repaint();
+		zoom(434168, 6412239, 484790.0, 379423.0, false, 0, 0, 0, 0);
 	}
 
 	//Draws all the edges
@@ -188,8 +191,8 @@ public class DrawGraph extends JComponent {
 					g.draw(new Line2D.Double(fromX, fromY, toX, toY));
 				}
 			}
-			
-		
+
+
 			CoastLines.getInstance().paintComponent(g, upperLeftX, upperLeftY, pixelFactor);
 
 
@@ -265,8 +268,8 @@ public class DrawGraph extends JComponent {
 			if(e.isShiftDown()) {
 				x2 = e.getX();
 				y2 = e.getY();
+				zoom(0,0,0,0,true, pixelToUTMConverter(x1), pixelToUTMConverter(x2), pixelToUTMConverter(y1), pixelToUTMConverter(y2));
 				GCThread.increaseGCFlag(10);
-				zoom();
 			}
 		}
 	}
@@ -281,11 +284,7 @@ public class DrawGraph extends JComponent {
 				y2 = e.getY();
 				upperLeftX -= ((x2-x1)*(75/factor));
 				upperLeftY += ((y2-y1)*(75/factor));
-
-				queryQT(new Interval<Double>(upperLeftX, upperLeftX+utmWidth), new Interval<Double>(upperLeftY-utmHeight, upperLeftY));
-				edges = qt.getEdges();
-				drawGraph(edges, getWidth(), getHeight());
-				repaint();
+				zoom(upperLeftX, upperLeftY, utmWidth, utmHeight, false, 0, 0, 0, 0);
 			}
 			if(e.isShiftDown()) {
 				x2 = Math.min(e.getX(), x1);
@@ -313,7 +312,7 @@ public class DrawGraph extends JComponent {
 				y1 = e.getY()+pixelConstant;
 				x2 = e.getX()+pixelConstant*preferredRatio;
 				y2 = e.getY()-pixelConstant;
-				zoom();
+				zoom(0,0,0,0, true, pixelToUTMConverter(x1), pixelToUTMConverter(x2), pixelToUTMConverter(y1), pixelToUTMConverter(y2));
 			}
 			else { //Zoom out
 				if(utmWidth >= 364790 || utmHeight >= 269423) { //You can't zoom more out than this
@@ -323,19 +322,7 @@ public class DrawGraph extends JComponent {
 					}
 					return;
 				}
-
-				upperLeftX -= pixelConstant*(3000/factor);
-				upperLeftY += pixelConstant*(3000/factor);
-				utmWidth += 2*preferredRatio*pixelConstant*(3000/factor);
-				utmHeight += 2*pixelConstant*(3000/factor);
-				utmWidthRelation = utmWidth/1000;
-				utmHeightRelation = utmHeight/1000;
-				calculateZoomLvl();
-				calculateFactor();
-				queryQT(new Interval<Double>(upperLeftX, upperLeftX+utmWidth), new Interval<Double>(upperLeftY-utmHeight, upperLeftY));
-				edges = qt.getEdges();
-				drawGraph(edges, getWidth(), getHeight());
-				repaint();
+				zoom(upperLeftX-(pixelConstant*(2500/factor)), upperLeftY+(pixelConstant*(2500/factor)),utmWidth+(2*preferredRatio*pixelConstant*(2500/factor)),utmHeight+(2*pixelConstant*(2500/factor)), false, 0,0,0,0);
 			}	
 			GCThread.increaseGCFlag(10);
 		}
