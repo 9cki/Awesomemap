@@ -32,9 +32,8 @@ public class Driver {
 			CreateGUI.getInstance(qt);
 			System.gc();
 			System.out.println("Garbage collection done");
-			System.out.println("Done drawing");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		} 
 	}
 }

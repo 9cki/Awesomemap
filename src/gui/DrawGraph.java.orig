@@ -353,7 +353,7 @@ public class DrawGraph extends JComponent {
 				queryQT(new Interval<Double>(upperLeftX, upperLeftX+utmWidth), new Interval<Double>(upperLeftY-utmHeight, upperLeftY));
 				edges = qt.getEdges();
 				drawGraph(edges, getWidth(), getHeight());
-				repaint();	
+				repaint();
 				GCThread.increaseGCFlag(10);
 			}
 		}

@@ -1,10 +1,9 @@
 package graph;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 public class QuadTree<Double extends Comparable> {
 	private MyNode root; //The root of the quadtree
-	private HashSet<MyEdge> edges = new HashSet<MyEdge>(); //Stores all the edges from and to the nodes in the given 2D interval
 
 	public void insert(MyNode node) {
 		root = insert(root, node);
@@ -28,31 +27,23 @@ public class QuadTree<Double extends Comparable> {
 			return false;
 	}
 
-	public void query2D(MyInterval2D<Double> rect) {
-		query2D(root, rect);
+	public ArrayList<MyNode> query2D(MyInterval2D<Double> rect) {
+		ArrayList<MyNode> nodeArrayList = new ArrayList<MyNode>();
+		return query2D(root, rect, nodeArrayList);
 	}
 	
 	//Finds all the nodes in a given 2D interval and adds them to the nodeArrayList
-	public void query2D(MyNode h, MyInterval2D<Double> rect) {
-		if(h == null) return;
+	public ArrayList<MyNode> query2D(MyNode h, MyInterval2D<Double> rect, ArrayList<MyNode> arr) {
+		if(h == null) return arr;
 		double xmin = rect.intervalX.low;
 		double ymin = rect.intervalY.low;
 		double xmax = rect.intervalX.high;
 		double ymax = rect.intervalY.high;
-		if(rect.contains(h.getX(), h.getY())) edges.addAll(h.getEdges());
-		if ( less(xmin, h.getX()) &&  less(ymin, h.getY())) query2D(h.SW, rect);
-		if ( less(xmin, h.getX()) && !less(ymax, h.getY())) query2D(h.NW, rect);
-		if (!less(xmax, h.getX()) && !less(ymax, h.getY())) query2D(h.NE, rect);
-		if (!less(xmax, h.getX()) &&  less(ymin, h.getY())) query2D(h.SE, rect);
-	}
-	
-	//Returns the nodeArrayList
-	public HashSet<MyEdge> getEdges() {
-		return edges;
-	}
-	
-	//Clears the nodeArrayList
-	public void clearEdges() {
-		edges.clear();
+		if(rect.contains(h.getX(), h.getY())) arr.add(h);
+		if ( less(xmin, h.getX()) &&  less(ymin, h.getY())) query2D(h.SW, rect, arr);
+		if ( less(xmin, h.getX()) && !less(ymax, h.getY())) query2D(h.NW, rect, arr);
+		if (!less(xmax, h.getX()) && !less(ymax, h.getY())) query2D(h.NE, rect, arr);
+		if (!less(xmax, h.getX()) &&  less(ymin, h.getY())) query2D(h.SE, rect, arr);
+		return arr;
 	}
 }

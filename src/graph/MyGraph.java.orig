@@ -53,10 +53,6 @@ public class MyGraph {
 						new MyEdge(nodes[Integer.parseInt(lineArray[0])-1], nodes[Integer.parseInt(lineArray[1])-1], 
 								Double.parseDouble(lineArray[2]), Integer.parseInt(lineArray[3]), lineArray[4], 
 								Integer.parseInt(lineArray[5])));
-				nodes[Integer.parseInt(lineArray[1])-1].addEdge(
-						new MyEdge(nodes[Integer.parseInt(lineArray[1])-1], nodes[Integer.parseInt(lineArray[0])-1], 
-								Double.parseDouble(lineArray[2]), Integer.parseInt(lineArray[3]), lineArray[4], 
-								Integer.parseInt(lineArray[5])));
 			}
 		}
 		edgeArray = null;
