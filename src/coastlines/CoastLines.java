@@ -13,7 +13,6 @@ public class CoastLines extends Thread {
 	public void run() {
 		MyCoastLines mcl = new MyCoastLines();
 		utmPoints = mcl.getUTMPoints();
-		System.out.println("CoastLines done!!!!");
 	}
 
 	public static CoastLines getInstance() {
