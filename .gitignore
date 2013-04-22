@@ -1,4 +1,5 @@
 *.class
+.class
 *.classpath
 *.project
 # Package Files #
