@@ -80,7 +80,6 @@ public class DrawGraph extends JComponent {
 	public void calculateZoomLvl() {
 		zoomLvl = ((484790.0/utmWidth*100 >= 379423.0/utmHeight*100)) ? (484790.0/utmWidth*100) : (379423.0/utmHeight*100);
 
-		System.out.println("Zoomlvl: " + zoomLvl);
 	}
 
 	private double pixelToUTMConverter(double d) {

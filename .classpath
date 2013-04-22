@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Mathias/Dropbox/ITU/2. Semester/Førsteårsprojekt/Førsteårsprojekt/ximpleware_2.11_java/vtd-xml.jar"/>
+	<classpathentry kind="lib" path="/Users/Thomas/Dropbox/ITU/Andet/ximpleware_2.11_java/vtd-xml.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
