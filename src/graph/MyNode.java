@@ -1,13 +1,14 @@
 package graph;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class MyNode {
 	private int kdv; //The kdv number of the node
 	private double x; //The x coordinate of the node (UTM)
 	private double y; //The y coordinate of the node (UTM)
 	public MyNode NW, NE, SW, SE; //The four subtrees of the quadtree
-	private ArrayList<MyEdge> edges = new ArrayList<MyEdge>(); //All edges from this node are stored here
+	private HashSet<MyEdge> edges = new HashSet<MyEdge>(); //All edges from this node are stored here
 	
 	//Initializes the node
 	public MyNode(int kdv, double xcoord, double ycoord) {
@@ -20,7 +21,7 @@ public class MyNode {
 		edges.add(e);
 	}
 	//Returns the ArrayList of type MyEdge
-	public ArrayList<MyEdge> getEdges() {
+	public HashSet<MyEdge> getEdges() {
 		return edges;
 	}
 	//Returns the number of edges in the ArrayList

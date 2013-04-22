@@ -1,6 +1,7 @@
 package graph;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import com.ximpleware.NavException;
 import com.ximpleware.ParseException;
@@ -10,7 +11,7 @@ import com.ximpleware.XPathParseException;
 
 public class MyGraph {
 
-	private static MyNode[] nodes;
+	public static MyNode[] nodes;
 
 	public MyGraph() throws NavException, XPathParseException, XPathEvalException, ParseException, IOException, InterruptedException {
 		InitNodesThread nThread = new InitNodesThread();
@@ -92,6 +93,14 @@ public class MyGraph {
 
 	public MyNode[] getNodeArray() {
 		return nodes;
+	}
+	
+	public HashSet<MyEdge> getEdges() {
+		HashSet<MyEdge> set = new HashSet<MyEdge>();
+		for(MyNode n : nodes) {
+			set.addAll(n.getEdges());
+		}
+		return set;
 	}
 
 
