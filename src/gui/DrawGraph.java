@@ -4,24 +4,26 @@ import graph.MyEdge;
 import graph.MyInterval2D;
 import graph.QuadTree;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.BasicStroke;
 import java.awt.RenderingHints;
-import java.awt.geom.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
-import coastlines.CoastLines;
 import util.GCThread;
+import coastlines.CoastLines;
 
 public class DrawGraph extends JComponent {
 	private HashSet<MyEdge> edges;
@@ -80,7 +82,6 @@ public class DrawGraph extends JComponent {
 	public void calculateZoomLvl() {
 		zoomLvl = ((484790.0/utmWidth*100 >= 379423.0/utmHeight*100)) ? (484790.0/utmWidth*100) : (379423.0/utmHeight*100);
 
-		System.out.println("Zoomlvl: " + zoomLvl);
 	}
 
 	private double pixelToUTMConverter(double d) {
@@ -102,18 +103,22 @@ public class DrawGraph extends JComponent {
 				y2utm2 = temp;
 			}
 
-			upperLeftX += x1utm2;
-			upperLeftY -= y1utm2;
-			utmWidth = x2utm2-x1utm2;
-			utmHeight = y2utm2-y1utm2;
-
-			if(utmWidth < 1500 || utmHeight < 1500) { //You can't zoom more than this (1500m in either width or height)
+			
+			if(x2utm2-x1utm2 < 1500 || y2utm2-y1utm2 < 1500) { //You can't zoom more than this (1500m in either width or height)
 				x1 = 0; y1 = 0; x2 = 0; y2 = 0;
+				/*
 				upperLeftX -= x1utm2;
 				upperLeftY += y1utm2;
+				*/
 				repaint();
 				return;
 			}
+
+			utmWidth = x2utm2-x1utm2;
+			utmHeight = y2utm2-y1utm2;
+			upperLeftX += x1utm2;
+			upperLeftY -= y1utm2;
+
 		}
 		else {
 

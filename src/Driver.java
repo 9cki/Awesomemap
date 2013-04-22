@@ -1,14 +1,11 @@
-import coastlines.CoastLines;
-import coastlines.MyCoastLines;
-import coastlines.MyUTMPoint;
-import util.GCThread;
-import gui.DijkstraSP;
-
 import graph.MyEdge;
 import graph.MyGraph;
 import graph.MyNode;
 import graph.QuadTree;
 import gui.CreateGUI;
+import gui.DijkstraSP;
+import util.GCThread;
+import coastlines.CoastLines;
 
 public class Driver {
 	public static boolean loading = true;
@@ -40,7 +37,7 @@ public class Driver {
 	                System.out.printf("%d to %d (%.2f)  ", 1, t, sp.distTo(t));
 	                if (sp.hasPathTo(t)) {
 	                    for (MyEdge e : sp.pathTo(t)) {
-	                        StdOut.print(e.getRoadName() + "   ");
+	                        System.out.println((e.getRoadName() + "   "));
 	                    }
 	                }
 	                System.out.println();

@@ -1,6 +1,9 @@
-import java.io.File;
 import java.net.URL;
-import javax.swing.*;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 public class LoadingThread extends Thread {
 
