@@ -45,6 +45,18 @@ public class Driver {
 			else
 				System.out.println("No path");
 			System.out.println();
+			
+			Iterable<MyEdge> path2 = sp.calculateShortestPath(443232, 441761);
+			if(path != null) {
+				for (MyEdge e : path2) {
+					System.out.println((e.getRoadName() + "   "));
+					e.putOnPath();
+				}
+				System.out.println(sp.distTo(441761));
+			}
+			else
+				System.out.println("No path");
+			System.out.println();
 
 			nodes = null;
 			mg = null;
