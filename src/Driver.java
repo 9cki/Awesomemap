@@ -1,3 +1,5 @@
+import java.util.Iterator;
+
 import graph.MyEdge;
 import graph.MyGraph;
 import graph.MyNode;
@@ -23,29 +25,27 @@ public class Driver {
 			MyGraph mg = new MyGraph();
 			MyNode[] nodes = mg.getNodeArray();
 			System.out.println("Nodes done");
-			
+
 			QuadTree<Double> qt = new QuadTree<Double>();
 			for(MyNode n : nodes) {
 				qt.insert(n);
 			}
 			System.out.println("Nodes inserted");
-			
-			DijkstraSP sp = new DijkstraSP(mg, 441761);
-	        // print shortest path
-			int t = 443225;
-	            if (sp.hasPathTo(t)) {
-	                System.out.printf("%d to %d (%.2f)  ", 1, t, sp.distTo(t));
-	                if (sp.hasPathTo(t)) {
-	                    for (MyEdge e : sp.pathTo(t)) {
-	                        System.out.println((e.getRoadName() + "   "));
-	                    }
-	                }
-	                System.out.println();
-	            }
-	            else {
-	                System.out.printf("%d to %d         no path\n", 1, t);
-	           }
-			
+
+			DijkstraSP sp = new DijkstraSP(mg);
+			// print shortest path
+			Iterable<MyEdge> path = sp.calculateShortestPath(298121, 441761);
+			if(path != null) {
+				for (MyEdge e : path) {
+					System.out.println((e.getRoadName() + "   "));
+					e.putOnPath();
+				}
+				System.out.println(sp.distTo(441761));
+			}
+			else
+				System.out.println("No path");
+			System.out.println();
+
 			nodes = null;
 			mg = null;
 			loading = false;

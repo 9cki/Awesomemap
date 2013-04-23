@@ -106,10 +106,6 @@ public class DrawGraph extends JComponent {
 			
 			if(x2utm2-x1utm2 < 1500 || y2utm2-y1utm2 < 1500) { //You can't zoom more than this (1500m in either width or height)
 				x1 = 0; y1 = 0; x2 = 0; y2 = 0;
-				/*
-				upperLeftX -= x1utm2;
-				upperLeftY += y1utm2;
-				*/
 				repaint();
 				return;
 			}
@@ -166,9 +162,25 @@ public class DrawGraph extends JComponent {
 			for(MyEdge e : edges) {
 				g.setStroke(new BasicStroke(1));
 				int roadType = e.getRoadType();
+				
 				if((roadType == 1 || roadType == 2 || roadType == 3 || roadType == 80 || roadType == 41 || 
 						(roadType == 4 && zoomLvl >= 300) || (roadType == 5 && zoomLvl >= 900) || (roadType == 8 && zoomLvl >= 3500)
-						||	(roadType != 8 && zoomLvl >= 2000))) { // filters different road types depending on the zoom level
+						||	(roadType != 8 && zoomLvl >= 2000)) || e.isOnPath()) { // filters different road types depending on the zoom level
+					
+					if(e.isOnPath()) {
+						Color pathColor = new Color(255,218,69, 50);
+						g.setColor(pathColor);
+						g.setStroke(new BasicStroke(5));
+						
+						double fromX = ((e.getFromNode().getX() - upperLeftX) / pixelFactor);
+						double fromY = ((upperLeftY - e.getFromNode().getY()) / pixelFactor);
+						double toX = ((e.getToNode().getX() - upperLeftX) / pixelFactor);
+						double toY = ((upperLeftY - e.getToNode().getY()) / pixelFactor);
+						g.draw(new Line2D.Double(fromX, fromY, toX, toY));
+					}
+					
+					g.setStroke(new BasicStroke(1));
+					
 					if(roadType == 1) {
 						g.setColor(Color.RED);
 						g.setStroke(sizeTwo);
@@ -193,6 +205,7 @@ public class DrawGraph extends JComponent {
 					double toY = ((upperLeftY - e.getToNode().getY()) / pixelFactor);
 					g.draw(new Line2D.Double(fromX, fromY, toX, toY));
 				}
+
 			}
 
 

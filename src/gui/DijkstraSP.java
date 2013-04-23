@@ -41,8 +41,10 @@ public class DijkstraSP {
     private double[] distTo;          // distTo[v] = distance  of shortest s->v path
     private MyEdge[] edgeTo;    // edgeTo[v] = last edge on shortest s->v path
     private IndexMinPQ<Double> pq;    // priority queue of vertices
+    private MyGraph G;
 
-    public DijkstraSP(MyGraph G, int s) {
+    public DijkstraSP(MyGraph G) {
+    	this.G= G;
         for (MyEdge e : G.getEdges()) {
             if (e.getLength() < 0)
                 throw new IllegalArgumentException("edge " + e + " has negative length");
@@ -50,21 +52,30 @@ public class DijkstraSP {
 
         distTo = new double[G.getNodeArray().length];
         edgeTo = new MyEdge[G.getNodeArray().length];
-        for (int v = 0; v < G.getNodeArray().length; v++)
+
+    }
+        
+    public Iterable<MyEdge> calculateShortestPath(int from, int to) {
+    	//Resets the arrays so previous searches results are removed
+        for (int v = 0; v < G.getNodeArray().length; v++) {
             distTo[v] = Double.POSITIVE_INFINITY;
-        distTo[s] = 0.0;
+    		edgeTo[v] = null;
+    }
+        
+    	distTo[from] = 0.0;
 
         // relax vertices in order of distance from s
         pq = new IndexMinPQ<Double>(G.getNodeArray().length);
-        pq.insert(s, distTo[s]);
+        pq.insert(from, distTo[from]);
         while (!pq.isEmpty()) {
             int v = pq.delMin();
             for (MyEdge e : G.nodes[v].getEdges())
                 relax(e);
         }
-
         // check optimality conditions
-        assert check(G, s);
+        assert check(G, from);
+        
+        return pathTo(to);
     }
 
     // relax edge e and update pq if changed
@@ -149,31 +160,4 @@ public class DijkstraSP {
         }
         return true;
     }
-
-
-   /* public static void main(String[] args) {
-        In in = new In(args[0]);
-        EdgeWeightedDigraph G = new EdgeWeightedDigraph(in);
-        int s = Integer.parseInt(args[1]);
-
-        // compute shortest paths
-        DijkstraSP sp = new DijkstraSP(G, s);
-
-
-        // print shortest path
-        for (int t = 0; t < G.V(); t++) {
-            if (sp.hasPathTo(t)) {
-                StdOut.printf("%d to %d (%.2f)  ", s, t, sp.distTo(t));
-                if (sp.hasPathTo(t)) {
-                    for (DirectedEdge e : sp.pathTo(t)) {
-                        StdOut.print(e + "   ");
-                    }
-                }
-                StdOut.println();
-            }
-            else {
-                StdOut.printf("%d to %d         no path\n", s, t);
-            }
-        }
-    }*/
 }

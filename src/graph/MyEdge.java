@@ -7,6 +7,7 @@ public class MyEdge {
 	private int roadType; //Road type of the edge
 	private String roadName; //Road name of the edge
 	private int speedLimit; //Speed limit of the edge
+	private boolean isOnPath = false;
 	
 	//Initializes the edge
 	public MyEdge(MyNode f, MyNode t, double l, int rt, String rn, int sl) {
@@ -36,6 +37,12 @@ public class MyEdge {
 	}
 	public int getSpeedLimit() {
 		return speedLimit;
+	}
+	public boolean isOnPath() {
+		return isOnPath;
+	}
+	public void putOnPath() {
+		isOnPath = true;
 	}
 	
 }
