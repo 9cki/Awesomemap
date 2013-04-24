@@ -246,9 +246,9 @@ public class CreateGUI {
 	 * Manipulates with the JButton given as a parameter. 
 	 * It adds the ImageIcon to the button, removes the border, 
 	 * changes the size and adds the actionListener for event-handling.
-	 * @param JButton btn
-	 * @param imageIcon i
-	 * @return JButton
+	 * @param JButton btn The button we manipulate
+	 * @param ImageIcon i The image icon that belongs to the button
+	 * @return JButton btn Returns the manipulated button
 	 */
 	public JButton button(JButton btn, ImageIcon i){
 		btn = new JButton(i);
