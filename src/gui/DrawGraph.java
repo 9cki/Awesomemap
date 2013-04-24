@@ -103,7 +103,7 @@ public class DrawGraph extends JComponent {
 				y2utm2 = temp;
 			}
 
-			
+
 			if(x2utm2-x1utm2 < 1500 || y2utm2-y1utm2 < 1500) { //You can't zoom more than this (1500m in either width or height)
 				x1 = 0; y1 = 0; x2 = 0; y2 = 0;
 				repaint();
@@ -144,7 +144,7 @@ public class DrawGraph extends JComponent {
 	}
 
 	//Resets the map to the initial state
-	private void resetMap() {
+	public void resetMap() {
 		zoom(434168, 6412239, 484790.0, 379423.0, false, 0, 0, 0, 0);
 	}
 
@@ -153,7 +153,7 @@ public class DrawGraph extends JComponent {
 		super.paintComponents(g);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.clearRect(0,0,getWidth(), getHeight());
-		drawGraph(edges, (int)CreateGUI.returnInstance().getWidth(), (int)CreateGUI.returnInstance().getHeight());
+		drawGraph(edges, (int)CreateGUI.returnInstance().getFrameWidth(), (int)CreateGUI.returnInstance().getFrameHeight());
 
 		BasicStroke sizeTwo = new BasicStroke(2);
 		BasicStroke sizeOnePointTwo = new BasicStroke(1.2f);
@@ -162,25 +162,25 @@ public class DrawGraph extends JComponent {
 			for(MyEdge e : edges) {
 				g.setStroke(new BasicStroke(1));
 				int roadType = e.getRoadType();
-				
+
 				if((roadType == 1 || roadType == 2 || roadType == 3 || roadType == 80 || roadType == 41 || 
 						(roadType == 4 && zoomLvl >= 300) || (roadType == 5 && zoomLvl >= 900) || (roadType == 8 && zoomLvl >= 3500)
 						||	(roadType != 8 && zoomLvl >= 2000)) || e.isOnPath()) { // filters different road types depending on the zoom level
-					
+
 					if(e.isOnPath()) {
 						Color pathColor = new Color(255,218,69, 50);
 						g.setColor(pathColor);
 						g.setStroke(new BasicStroke(5));
-						
+
 						double fromX = ((e.getFromNode().getX() - upperLeftX) / pixelFactor);
 						double fromY = ((upperLeftY - e.getFromNode().getY()) / pixelFactor);
 						double toX = ((e.getToNode().getX() - upperLeftX) / pixelFactor);
 						double toY = ((upperLeftY - e.getToNode().getY()) / pixelFactor);
 						g.draw(new Line2D.Double(fromX, fromY, toX, toY));
 					}
-					
+
 					g.setStroke(new BasicStroke(1));
-					
+
 					if(roadType == 1) {
 						g.setColor(Color.RED);
 						g.setStroke(sizeTwo);
@@ -233,14 +233,19 @@ public class DrawGraph extends JComponent {
 		}
 		dragging = false;
 	}
+	
+	private void doPop(MouseEvent e){
+        PopUp menu = new PopUp(this);
+        menu.show(e.getComponent(), e.getX(), e.getY());
+    }
 
 	private class MyMouseListener implements MouseListener {
 		@Override
 		public void mouseClicked(MouseEvent e) { //Right-clicking the mouse resets the map
-			if(e.getButton() == 3) {
+			/*if(e.getButton() == 3) {
 				resetMap();
 				GCThread.increaseGCFlag(40);
-			}
+			}*/
 			if(e.getClickCount() == 2 && !e.isConsumed()) {
 				e.consume();
 				double x = upperLeftX + (e.getX() * (1000/factor)); 
@@ -277,6 +282,10 @@ public class DrawGraph extends JComponent {
 		public void mousePressed(MouseEvent e) { //The upper left corner of the marked square (pixel coordinates) 
 			x1 = e.getX();
 			y1 = e.getY();
+
+			if (e.isPopupTrigger()){
+				doPop(e);
+			}
 		}
 
 		@Override
@@ -287,7 +296,12 @@ public class DrawGraph extends JComponent {
 				zoom(0,0,0,0,true, pixelToUTMConverter(x1), pixelToUTMConverter(x2), pixelToUTMConverter(y1), pixelToUTMConverter(y2));
 				GCThread.increaseGCFlag(10);
 			}
+
+			if (e.isPopupTrigger()){
+				doPop(e);
+			}
 		}
+		
 	}
 
 	private class MyMouseAdapter extends MouseAdapter {

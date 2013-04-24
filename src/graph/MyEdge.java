@@ -44,5 +44,8 @@ public class MyEdge {
 	public void putOnPath() {
 		isOnPath = true;
 	}
+	public void removeFromPath() {
+		isOnPath = false;
+	}
 	
 }

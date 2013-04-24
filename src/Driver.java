@@ -23,11 +23,10 @@ public class Driver {
 		gct.start();
 		try {
 			MyGraph mg = new MyGraph();
-			MyNode[] nodes = mg.getNodeArray();
 			System.out.println("Nodes done");
 
 			QuadTree<Double> qt = new QuadTree<Double>();
-			for(MyNode n : nodes) {
+			for(MyNode n : mg.getNodeArray()) {
 				qt.insert(n);
 			}
 			System.out.println("Nodes inserted");
@@ -45,20 +44,7 @@ public class Driver {
 			else
 				System.out.println("No path");
 			System.out.println();
-			
-			Iterable<MyEdge> path2 = sp.calculateShortestPath(443232, 441761);
-			if(path != null) {
-				for (MyEdge e : path2) {
-					System.out.println((e.getRoadName() + "   "));
-					e.putOnPath();
-				}
-				System.out.println(sp.distTo(441761));
-			}
-			else
-				System.out.println("No path");
-			System.out.println();
-
-			nodes = null;
+		
 			mg = null;
 			loading = false;
 			lt = null;
