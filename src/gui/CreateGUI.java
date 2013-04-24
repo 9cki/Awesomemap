@@ -19,6 +19,7 @@ public class CreateGUI {
 	private static CreateGUI instance = null; //Used for the Singleton pattern
 	private buttonActionListener bal = new buttonActionListener();
 	private static GuiMethods guiM;
+	private DrawGraph dg;
 	
 	// JPanels
 	JPanel leftPanel = new JPanel();
@@ -108,7 +109,7 @@ public class CreateGUI {
 		double tempHeight = height/1.2;
 		
 		//Adds the map as a JComponent
-		JComponent dg = DrawGraph.getInstance(qt, (int) tempWidth, (int) tempHeight);
+		dg = DrawGraph.getInstance(qt, (int) tempWidth, (int) tempHeight);
 		dg.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		addLogoPanel();
@@ -300,19 +301,19 @@ public class CreateGUI {
 			} else if(e.getSource() == search_btn){
 				System.out.println("Search from " + getTextFromTextField(from) + " to " + getTextFromTextField(to));
 			} else if(e.getSource() == zoomIn_btn){
-				System.out.println("Zoom in++++");
+				dg.zoomIn();
 			} else if(e.getSource() == zoomOut_btn){
-				guiM.zoomOut();
+				dg.zoomOut();
 			} else if(e.getSource() == reset_btn){
-				System.out.println("Reset the map!");
+				dg.resetMap();
 			} else if(e.getSource() == arrowUp_btn){
-				System.out.println("Pan upwards");
+				dg.pan(1);
 			} else if(e.getSource() == arrowDown_btn){
-				System.out.println("Pan downwards");
+				dg.pan(2);
 			} else if(e.getSource() == arrowLeft_btn){
-				System.out.println("Pan Left!");
+				dg.pan(3);
 			} else if(e.getSource() == arrowRight_btn){
-				System.out.println("Pan right");
+				dg.pan(4);
 			}
 			
 		}
