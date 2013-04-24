@@ -1,4 +1,4 @@
-package gui;
+package util;
 /*************************************************************************
  *  Compilation:  javac IndexMinPQ.java
  *  Execution:    java IndexMinPQ

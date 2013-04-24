@@ -5,7 +5,7 @@ import graph.MyGraph;
 import graph.MyNode;
 import graph.QuadTree;
 import gui.CreateGUI;
-import gui.DijkstraSP;
+import util.DijkstraSP;
 import util.GCThread;
 import coastlines.CoastLines;
 
