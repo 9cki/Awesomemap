@@ -17,6 +17,8 @@ public class CreateGUI {
 	public double width; //The width of the frame
 	public double height; //The height of the frame
 	private static CreateGUI instance = null; //Used for the Singleton pattern
+	private buttonActionListener bal = new buttonActionListener();
+	private static GuiMethods guiM;
 	
 	// JPanels
 	JPanel leftPanel = new JPanel();
@@ -106,7 +108,7 @@ public class CreateGUI {
 		double tempHeight = height/1.2;
 		
 		//Adds the map as a JComponent
-		JComponent dg = new DrawGraph(qt, (int) tempWidth, (int) tempHeight);
+		JComponent dg = DrawGraph.getInstance(qt, (int) tempWidth, (int) tempHeight);
 		dg.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		addLogoPanel();
@@ -228,6 +230,7 @@ public class CreateGUI {
 	}
 	
 	public void createButtons(){
+		guiM = new GuiMethods();
 		twitter_btn = button(twitter_btn, twitter);
 		ruteDirections_btn = button(ruteDirections_btn, ruteDirections);
 		search_btn = button(search_btn, search);
@@ -253,8 +256,9 @@ public class CreateGUI {
 	public JButton button(JButton btn, ImageIcon i){
 		btn = new JButton(i);
 		btn.setBorderPainted(false);
+		btn.setBackground(null);
 		btn.setPreferredSize(new Dimension(50,50));
-		btn.addActionListener(new buttonActionListener());
+		btn.addActionListener(bal);
 		return btn;
 	}
 	
@@ -298,7 +302,7 @@ public class CreateGUI {
 			} else if(e.getSource() == zoomIn_btn){
 				System.out.println("Zoom in++++");
 			} else if(e.getSource() == zoomOut_btn){
-				System.out.println("Zoom out----");
+				guiM.zoomOut();
 			} else if(e.getSource() == reset_btn){
 				System.out.println("Reset the map!");
 			} else if(e.getSource() == arrowUp_btn){

@@ -28,7 +28,7 @@ import coastlines.CoastLines;
 public class DrawGraph extends JComponent {
 	private HashSet<MyEdge> edges;
 	private QuadTree<Double> qt;
-
+	private static DrawGraph instance;
 	private double upperLeftX = 434168; //The upper left corner in UTM-coordinates
 	private double upperLeftY = 6412239; //The upper left corner in UTM-coordinates
 	public double width = 1.0; //The dimensions of the JFrame (overwritten in the constructor)
@@ -44,9 +44,10 @@ public class DrawGraph extends JComponent {
 	private double rectWidth, rectHeight; //The width and height of the marked square when zooming
 	private double zoomLvl = 100;
 	public static int garbageCollectorFlag = 0;
+	private double pixelConstant = 150;
 
 	//Initializes the DrawGraph class
-	public DrawGraph(QuadTree<Double> qt, int w, int h) {
+	private DrawGraph(QuadTree<Double> qt, int w, int h) {
 		this.qt = qt;
 		//Gets all the nodes in the given interval (All of Denmark)
 		queryQT(new Interval<Double>(upperLeftX, upperLeftX+utmWidth), new Interval<Double>(upperLeftY-utmHeight, upperLeftY));
@@ -56,8 +57,21 @@ public class DrawGraph extends JComponent {
 		addMouseMotionListener(new MyMouseAdapter());
 		addMouseWheelListener(new MyMouseWheelListener());
 	}
+	
+	public static DrawGraph getInstance(QuadTree<Double> qt, int w, int h) {
+		if(instance != null) return instance;
+		else {
+			instance = new DrawGraph(qt, w, h);
+			return instance;
+		}
+	}
+	
+	public static DrawGraph getInstance() {
+		if(instance != null) return instance;
+		else return null;
+	}
 
-	public void drawGraph(HashSet<MyEdge> e, double w, double h){
+	private void drawGraph(HashSet<MyEdge> e, double w, double h){
 		edges = e;
 		width = w;
 		height = h;
@@ -87,7 +101,18 @@ public class DrawGraph extends JComponent {
 	private double pixelToUTMConverter(double d) {
 		return d * (1000/factor); //Calculates the UTM coordinates instead of pixel coordinates
 	}
-
+	
+	public void zoomOut(){
+		if(utmWidth >= 364790 || utmHeight >= 269423) { //You can't zoom more out than this
+			//If the upper left corner is not in the right position, reset the map
+			if(upperLeftX != 434168 && upperLeftY != 6412239) { 
+				resetMap(); 
+			}
+			return;
+		}
+		zoom(upperLeftX-(pixelConstant*(2500/factor)), upperLeftY+(pixelConstant*(2500/factor)),utmWidth+(2*preferredRatio*pixelConstant*(2500/factor)),utmHeight+(2*pixelConstant*(2500/factor)), false, 0,0,0,0);
+	}
+	
 	//Zooms in on the map
 	private void zoom(double upperLeftX2, double upperLeftY2, double utmWidth2, double utmHeight2, boolean zoomIn, double x1utm2, double x2utm2, double y1utm2, double y2utm2) {
 
@@ -331,7 +356,6 @@ public class DrawGraph extends JComponent {
 		public void mouseWheelMoved(MouseWheelEvent e) {
 			int notches = e.getWheelRotation();
 			//A pixel constant used for setting the interval when only given one point (pixel coordinates of the mouse when scrolling)
-			double pixelConstant = 150;
 			if(notches < 0) { //Zoom in
 				if(utmWidth < 1500 || utmHeight < 1500) { //You can't zoom more than this (1500m in either width or height)
 					return;
@@ -343,14 +367,7 @@ public class DrawGraph extends JComponent {
 				zoom(0,0,0,0, true, pixelToUTMConverter(x1), pixelToUTMConverter(x2), pixelToUTMConverter(y1), pixelToUTMConverter(y2));
 			}
 			else { //Zoom out
-				if(utmWidth >= 364790 || utmHeight >= 269423) { //You can't zoom more out than this
-					//If the upper left corner is not in the right position, reset the map
-					if(upperLeftX != 434168 && upperLeftY != 6412239) { 
-						resetMap(); 
-					}
-					return;
-				}
-				zoom(upperLeftX-(pixelConstant*(2500/factor)), upperLeftY+(pixelConstant*(2500/factor)),utmWidth+(2*preferredRatio*pixelConstant*(2500/factor)),utmHeight+(2*pixelConstant*(2500/factor)), false, 0,0,0,0);
+				zoomOut();
 			}	
 			GCThread.increaseGCFlag(10);
 		}
