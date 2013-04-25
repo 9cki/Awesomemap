@@ -70,7 +70,8 @@ public class DijkstraSP {
 		while (!pq.isEmpty()) {
 			int v = pq.delMin();
 			for (MyEdge e : G.nodes[v].getEdges())
-				relax(e);
+				if(e.getRoadType() != 8) // Ensures that the path does not include paths for bicycles etc.
+					relax(e);
 		}
 		// check optimality conditions
 		assert check(G, from);

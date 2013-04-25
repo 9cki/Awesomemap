@@ -230,7 +230,7 @@ public class CreateGUI {
 	}
 	
 	public void createButtons(){
-		guiM = new GuiMethods();
+		guiM = GuiMethods.getInstance();
 		twitter_btn = button(twitter_btn, twitter);
 		ruteDirections_btn = button(ruteDirections_btn, ruteDirections);
 		search_btn = button(search_btn, search);
@@ -299,6 +299,7 @@ public class CreateGUI {
 				System.out.println("RuteDirections");
 			} else if(e.getSource() == search_btn){
 				System.out.println("Search from " + getTextFromTextField(from) + " to " + getTextFromTextField(to));
+				guiM.createPath(getTextFromTextField(from), getTextFromTextField(to));
 			} else if(e.getSource() == zoomIn_btn){
 				System.out.println("Zoom in++++");
 			} else if(e.getSource() == zoomOut_btn){

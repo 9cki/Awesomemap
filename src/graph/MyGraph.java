@@ -12,6 +12,7 @@ import com.ximpleware.XPathParseException;
 public class MyGraph {
 
 	public static MyNode[] nodes;
+	private static MyGraph instance;
 
 	public MyGraph() throws NavException, XPathParseException, XPathEvalException, ParseException, IOException, InterruptedException {
 		InitNodesThread nThread = new InitNodesThread();
@@ -24,6 +25,18 @@ public class MyGraph {
 		while(nThread.isAlive() || eThread.isAlive()) {
 			Thread.sleep(10);
 		}
+	}
+	
+	
+	public static MyGraph getInstance() {
+		if(instance == null)
+			try {
+				instance = new MyGraph();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return instance;
 	}
 
 	//Initializes the nodes in an array
