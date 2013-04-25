@@ -2,6 +2,7 @@ package gui;
 import graph.Interval;
 import graph.MyEdge;
 import graph.MyInterval2D;
+import graph.MyNode;
 import graph.QuadTree;
 
 import java.awt.BasicStroke;
@@ -9,6 +10,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,6 +21,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
@@ -45,6 +48,8 @@ public class DrawGraph extends JComponent {
 	private double zoomLvl = 100;
 	public static int garbageCollectorFlag = 0;
 	private double pixelConstant = 150;
+	private MyNode dirFromNode, dirToNode;
+	private ImageIcon locationImg = createImageIcon("img/location.png");
 
 	//Initializes the DrawGraph class
 	private DrawGraph(QuadTree<Double> qt, int w, int h) {
@@ -56,8 +61,9 @@ public class DrawGraph extends JComponent {
 		addMouseListener(new MyMouseListener());
 		addMouseMotionListener(new MyMouseAdapter());
 		addMouseWheelListener(new MyMouseWheelListener());
+
 	}
-	
+
 	public static DrawGraph getInstance(QuadTree<Double> qt, int w, int h) {
 		if(instance != null) return instance;
 		else {
@@ -65,10 +71,20 @@ public class DrawGraph extends JComponent {
 			return instance;
 		}
 	}
-	
+
 	public static DrawGraph getInstance() {
 		if(instance != null) return instance;
 		else return null;
+	}
+
+	protected ImageIcon createImageIcon(String path) {
+		java.net.URL imgURL = getClass().getResource(path);
+		if (imgURL != null) {
+			return new ImageIcon(imgURL);
+		} else {
+			System.err.println("Couldn't find file: " + path);
+			return null;
+		}
 	}
 
 	private void drawGraph(HashSet<MyEdge> e, double w, double h){
@@ -101,7 +117,24 @@ public class DrawGraph extends JComponent {
 	private double pixelToUTMConverter(double d) {
 		return d * (1000/factor); //Calculates the UTM coordinates instead of pixel coordinates
 	}
-	
+
+	/*
+	 * Pan the map in the given direction
+	 * @param int direction 1 = up, 2 = down, 3 = left, 4 = right
+	 */
+	public void pan(int direction) {
+		GCThread.increaseGCFlag(5);
+		switch(direction) {
+		case 1: zoom(upperLeftX, (upperLeftY+(utmHeight*0.1)), utmWidth, utmHeight, false, 0, 0, 0, 0);
+		break;
+		case 2: zoom(upperLeftX, (upperLeftY-(utmHeight*0.1)), utmWidth, utmHeight, false, 0, 0, 0, 0);
+		break;
+		case 3: zoom((upperLeftX-(utmWidth*0.1)), upperLeftY, utmWidth, utmHeight, false, 0, 0, 0, 0);
+		break;
+		case 4: zoom((upperLeftX+(utmWidth*0.1)), upperLeftY, utmWidth, utmHeight, false, 0, 0, 0, 0);
+		break;
+		}
+	}
 	public void zoomOut(){
 		if(utmWidth >= 364790 || utmHeight >= 269423) { //You can't zoom more out than this
 			//If the upper left corner is not in the right position, reset the map
@@ -110,11 +143,17 @@ public class DrawGraph extends JComponent {
 			}
 			return;
 		}
-		zoom(upperLeftX-(pixelConstant*(2500/factor)), upperLeftY+(pixelConstant*(2500/factor)),utmWidth+(2*preferredRatio*pixelConstant*(2500/factor)),utmHeight+(2*pixelConstant*(2500/factor)), false, 0,0,0,0);
+		zoom(upperLeftX-(utmWidth*0.1), upperLeftY+(utmHeight*0.1),utmWidth*1.2,utmHeight*1.2, false, 0,0,0,0);
+		//		zoom(upperLeftX-(pixelConstant*(2500/factor)), upperLeftY+(pixelConstant*(2500/factor)),utmWidth+(2*preferredRatio*pixelConstant*(2500/factor)),utmHeight+(2*pixelConstant*(2500/factor)), false, 0,0,0,0);
 	}
-	
+
+	//Called when zooming with the button
+	public void zoomIn() {
+		zoom(0,0,0,0, true, pixelToUTMConverter((width-250)*0.1), pixelToUTMConverter((width-250)*0.9), pixelToUTMConverter(height*0.1), pixelToUTMConverter(height*0.9));
+	}
 	//Zooms in on the map
-	private void zoom(double upperLeftX2, double upperLeftY2, double utmWidth2, double utmHeight2, boolean zoomIn, double x1utm2, double x2utm2, double y1utm2, double y2utm2) {
+	private void zoom(double upperLeftX2, double upperLeftY2, double utmWidth2, double utmHeight2, boolean zoomIn,
+			double x1utm2, double x2utm2, double y1utm2, double y2utm2) {
 
 		if(zoomIn) {
 			if(x1utm2 > x2utm2) { //If x1 > x2 then switch
@@ -171,6 +210,7 @@ public class DrawGraph extends JComponent {
 	//Resets the map to the initial state
 	public void resetMap() {
 		zoom(434168, 6412239, 484790.0, 379423.0, false, 0, 0, 0, 0);
+		GCThread.increaseGCFlag(40);
 	}
 
 	//Draws all the edges
@@ -256,44 +296,72 @@ public class DrawGraph extends JComponent {
 			}
 			g2.draw(new Rectangle2D.Double(x2, y2, rectWidth, rectHeight));
 		}
+		if(dirFromNode != null) {
+			int size = 32;
+			Image locImg = locationImg.getImage();
+			Image newImg = locImg.getScaledInstance(size, size, 0);
+			locationImg = new ImageIcon(newImg);
+			locationImg.paintIcon(this, g2, (int)((dirFromNode.getX() - upperLeftX) / (1000/factor))-size/2, (int)((upperLeftY - dirFromNode.getY()) / (1000/factor)-(size*0.875)));
+		}
+		if(dirToNode != null) {
+			int size = 32;
+			Image locImg = locationImg.getImage();
+			Image newImg = locImg.getScaledInstance(size, size, 0);
+			locationImg = new ImageIcon(newImg);
+			locationImg.paintIcon(this, g2, (int)((dirToNode.getX() - upperLeftX) / (1000/factor))-size/2, (int)((upperLeftY - dirToNode.getY()) / (1000/factor)-(size*0.875)));
+		}
 		dragging = false;
 	}
-	
+
 	private void doPop(MouseEvent e){
-        PopUp menu = new PopUp(this);
-        menu.show(e.getComponent(), e.getX(), e.getY());
-    }
+		PopUp menu = new PopUp(this);
+		x1 = e.getX();
+		y1 = e.getY();
+		menu.show(e.getComponent(), e.getX(), e.getY());
+	}
+
+	public void findNearestNode(int type) {
+		double x = upperLeftX + (x1 * (1000/factor)); 
+		double y = upperLeftY - (y1 * (1000/factor));
+		HashSet<MyEdge> nearestEdges = new HashSet<MyEdge>();
+		int range = 100;
+		for(MyEdge edge : edges) {
+			if(((edge.getFromNode().getX() - range) < x && x < (edge.getFromNode().getX() + range) &&
+					(edge.getFromNode().getY() - range) < y && y < (edge.getFromNode().getY() + range)) || 
+					(edge.getToNode().getX() - range) < x && x < (edge.getToNode().getX() + range) &&
+					(edge.getToNode().getY() - range) < y && y < (edge.getToNode().getY() + range)) {
+				nearestEdges.add(edge);
+			}
+		}
+		MyEdge nearest = null;
+		for(MyEdge ne : nearestEdges) {
+			if(nearest == null) { nearest = ne; }
+			else if((Math.abs((x - ne.getFromNode().getX()) + (y - ne.getFromNode().getY())) <
+					Math.abs((x - nearest.getFromNode().getX()) + (y - nearest.getFromNode().getY())))) {
+				nearest = ne;
+			}
+		}
+		if(nearest != null) {
+			String roadname = nearest.getRoadName();
+			switch(type) {
+			case 1: System.out.println("Show directions from: " + roadname);
+			dirFromNode = nearest.getFromNode();
+			break;
+			case 2: System.out.println("Show directions to: " + roadname);
+			dirToNode = nearest.getFromNode();
+			break;
+			case 3: System.out.println("Nearest edge: " + roadname);
+			break;				
+			}
+		}
+	}
 
 	private class MyMouseListener implements MouseListener {
 		@Override
-		public void mouseClicked(MouseEvent e) { //Right-clicking the mouse resets the map
-			/*if(e.getButton() == 3) {
-				resetMap();
-				GCThread.increaseGCFlag(40);
-			}*/
+		public void mouseClicked(MouseEvent e) { 
 			if(e.getClickCount() == 2 && !e.isConsumed()) {
 				e.consume();
-				double x = upperLeftX + (e.getX() * (1000/factor)); 
-				double y = upperLeftY - (e.getY() * (1000/factor));
-				HashSet<MyEdge> nearestEdges = new HashSet<MyEdge>();
-				int range = 10;
-				for(MyEdge edge : edges) {
-					if(((edge.getFromNode().getX() - range) < x && x < (edge.getFromNode().getX() + range) &&
-							(edge.getFromNode().getY() - range) < y && y < (edge.getFromNode().getY() + range)) || 
-							(edge.getToNode().getX() - range) < x && x < (edge.getToNode().getX() + range) &&
-							(edge.getToNode().getY() - range) < y && y < (edge.getToNode().getY() + range)) {
-						nearestEdges.add(edge);
-					}
-				}
-				MyEdge nearest = null;
-				for(MyEdge ne : nearestEdges) {
-					if(nearest == null) { nearest = ne; }
-					else if((Math.abs((x - ne.getFromNode().getX()) + (y - ne.getFromNode().getY())) <
-							Math.abs((x - nearest.getFromNode().getX()) + (y - nearest.getFromNode().getY())))) {
-						nearest = ne;
-					}
-				}
-				if(nearest != null) {System.out.println("Nearest edge: " + nearest.getRoadName());}
+				findNearestNode(3);
 			}
 		}
 
@@ -326,7 +394,7 @@ public class DrawGraph extends JComponent {
 				doPop(e);
 			}
 		}
-		
+
 	}
 
 	private class MyMouseAdapter extends MouseAdapter {

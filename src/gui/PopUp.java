@@ -17,7 +17,10 @@ class PopUp extends JPopupMenu {
         from = new JMenuItem("Show directions from here!");
         to = new JMenuItem("Show directions to here!");
         
-        reset.addActionListener(new ResetActionListener());
+        reset.addActionListener(new ResetButtonActionListener());
+        from.addActionListener(new FromButtonActionListener());
+        to.addActionListener(new ToButtonActionListener());
+        
         
         add(reset);
         addSeparator();
@@ -25,13 +28,26 @@ class PopUp extends JPopupMenu {
         add(to);
     }
     
-    private class ResetActionListener implements ActionListener {
-
+    private class ResetButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			dgInstance.resetMap();
-			
 		}
-    	
+    }
+    
+    private class FromButtonActionListener implements ActionListener {
+    	@Override
+    	public void actionPerformed(ActionEvent e) {
+    		dgInstance.findNearestNode(1);
+    		dgInstance.repaint();
+    	}
+    }
+    
+    private class ToButtonActionListener implements ActionListener {
+    	@Override
+    	public void actionPerformed(ActionEvent e) {
+    		dgInstance.findNearestNode(2);
+    		dgInstance.repaint();
+    	}
     }
 }
