@@ -233,9 +233,9 @@ public class DrawGraph extends JComponent {
 						||	(roadType != 8 && zoomLvl >= 2000)) || e.isOnPath()) { // filters different road types depending on the zoom level
 
 					if(e.isOnPath()) {
-						Color pathColor = new Color(255,218,69, 50);
+						Color pathColor = new Color(255,218,69, 100);
 						g.setColor(pathColor);
-						g.setStroke(new BasicStroke(5));
+						g.setStroke(new BasicStroke(10));
 
 						double fromX = ((e.getFromNode().getX() - upperLeftX) / pixelFactor);
 						double fromY = ((upperLeftY - e.getFromNode().getY()) / pixelFactor);

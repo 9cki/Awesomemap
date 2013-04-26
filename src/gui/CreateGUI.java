@@ -302,9 +302,9 @@ public class CreateGUI {
 				    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
 				    == JOptionPane.YES_OPTION)
 				{
-				if(from) GuiMethods.nodeFromKDV = entry.getValue().getFromNode().getKDV();
+				if(from) GuiMethods.nodeFromKDV = entry.getValue().getFromNode().getKDV()-1;
 				else {
-					GuiMethods.nodeToKDV = entry.getValue().getFromNode().getKDV();
+					GuiMethods.nodeToKDV = entry.getValue().getFromNode().getKDV()-1;
 					guiM.searchForPath();
 				}
 				break;
