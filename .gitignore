@@ -85,3 +85,5 @@ bin/gui/DrawGraph$MyMouseListener.class
 bin/gui/DrawGraph$MyMouseWheelListener.class
 bin/gui/DrawGraph.class
 bin/LoadingThread.class
+bin/gui/CreateGUI.class
+bin/gui/DrawGraph.class
