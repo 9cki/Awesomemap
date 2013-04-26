@@ -1,6 +1,5 @@
 package gui;
 
-import java.util.HashMap;
 import java.util.Stack;
 
 import graph.MyEdge;
@@ -16,14 +15,14 @@ public class GuiMethods {
 	private static QuadTree qt;
 	private static MyGraph g;
 	private static Stack<MyEdge> edgesOnPath = new Stack<MyEdge>();
-	public static int nodeFromKDV = -1;
-	public static int nodeToKDV = -1;
 
-	public GuiMethods() {
+	private GuiMethods() {
 		setDrawGraphInstance();
-		this.g = MyGraph.getInstance();
+	}
+
+	public GuiMethods(MyGraph g, QuadTree qt) {
 		dsp = new DijkstraSP(g);
-		
+		this.g = g;
 	}
 
 	public void zoomOut() {
@@ -44,24 +43,22 @@ public class GuiMethods {
 	}
 
 
-	public void findNodeKDV(String edgeRoadName, boolean from) {
-		HashMap<String, MyEdge> possibleEdges = new HashMap<String, MyEdge>();
+	public int findNodeKDV(String edgeRoadName) {
 		for(MyNode n : g.getNodeArray())
 			for(MyEdge e : n.getEdges()) {
 				if(e.getRoadName().equals(edgeRoadName)) {
-					possibleEdges.put(e.getRoadName() + " " + e.getPostalCode(), e);
+					System.out.println("edge found!");
+					return n.getKDV();
 				}
 			}
-		CreateGUI.returnInstance().showPossibleEdges(possibleEdges, from);
+		return -1;
 	}
 
 	public void createPath(String textFromTextField, String textFromTextField2) {
 		setDrawGraphInstance();
-		findNodeKDV(textFromTextField, true);
-		findNodeKDV(textFromTextField2, false);
-	}
-	
-	public void searchForPath() {
+		
+		int nodeFromKDV = findNodeKDV(textFromTextField);
+		int nodeToKDV = findNodeKDV(textFromTextField2);
 
 		if(nodeFromKDV == -1 || nodeToKDV == -1) {
 			System.out.println("edges not found");
@@ -79,6 +76,7 @@ public class GuiMethods {
 		Iterable<MyEdge> path = dsp.calculateShortestPath(nodeFromKDV, nodeToKDV);
 		if(path != null) {
 			for (MyEdge e : path) {
+				System.out.println((e.getRoadName() + "   "));
 				edgesOnPath.push(e);
 				e.putOnPath();
 			}
@@ -87,8 +85,5 @@ public class GuiMethods {
 		else
 			System.out.println("No path");
 		System.out.println();
-		
-		nodeFromKDV = -1;
-		nodeToKDV = -1;
 	}
 }

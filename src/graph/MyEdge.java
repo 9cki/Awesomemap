@@ -8,15 +8,17 @@ public class MyEdge {
 	private String roadName; //Road name of the edge
 	private int speedLimit; //Speed limit of the edge
 	private boolean isOnPath = false;
+	private int postalCode;
 	
 	//Initializes the edge
-	public MyEdge(MyNode f, MyNode t, double l, int rt, String rn, int sl) {
+	public MyEdge(MyNode f, MyNode t, double l, int rt, String rn, int sl, int pc) {
 		fromNode = f;
 		toNode = t;
 		length = l;
 		roadType = rt;
 		roadName = rn;
 		speedLimit = sl;
+		postalCode = pc;
 	}
 	
 	//Getters for all the private fields
@@ -46,6 +48,9 @@ public class MyEdge {
 	}
 	public void removeFromPath() {
 		isOnPath = false;
+	}
+	public int getPostalCode() {
+		return postalCode;
 	}
 	
 }

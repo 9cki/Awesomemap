@@ -18,6 +18,7 @@ public class MyEdgeVTD {
 	private static String roadType;
 	private static String roadName;
 	private static String speedLimit;
+	private static String postalCode;
 	
 	private static String[] sArray = new String[812301]; //Initialized to the exact number of edges in the dataset
 	
@@ -81,12 +82,17 @@ public class MyEdgeVTD {
 					roadName = null;
 				 	roadName = vn.toNormalizedString(t);
 				 }
+				 if((t=vn.getAttrVal("postalCodesFromAndTo")) != -1) {
+					 String string = vn.toNormalizedString(t);
+					 String[] splittedString = string.split(",");
+					 postalCode = splittedString[0];
+				 }
 				 if ((t=vn.getAttrVal("speedLimit"))!= -1) {
 					 speedLimit = null;
 					 speedLimit = vn.toNormalizedString(t);
 					 //Add all the information to one string
 					 String finalString = nodeFrom + " &&& " + nodeTo + " &&& " + length + " &&& " 
-							 + roadType + " &&& " + roadName + " &&& " + speedLimit;
+							 + roadType + " &&& " + roadName + " &&& " + speedLimit + " &&& " + postalCode;
 					 sArray[count] = finalString;
 					 //System.out.println(finalString);
 					 count++;

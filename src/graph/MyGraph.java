@@ -66,11 +66,11 @@ public class MyGraph {
 				nodes[Integer.parseInt(lineArray[0])-1].addEdge(
 						new MyEdge(nodes[Integer.parseInt(lineArray[0])-1], nodes[Integer.parseInt(lineArray[1])-1], 
 								Double.parseDouble(lineArray[2]), Integer.parseInt(lineArray[3]), lineArray[4], 
-								Integer.parseInt(lineArray[5])));
+								Integer.parseInt(lineArray[5]), Integer.parseInt(lineArray[6])));
 				nodes[Integer.parseInt(lineArray[1])-1].addEdge(
 						new MyEdge(nodes[Integer.parseInt(lineArray[1])-1], nodes[Integer.parseInt(lineArray[0])-1], 
 								Double.parseDouble(lineArray[2]), Integer.parseInt(lineArray[3]), lineArray[4], 
-								Integer.parseInt(lineArray[5])));
+								Integer.parseInt(lineArray[5]), Integer.parseInt(lineArray[6])));
 			}
 		}
 		edgeArray = null;
@@ -131,11 +131,14 @@ public class MyGraph {
 	public class InitEdgesThread extends Thread {
 
 		public void run() {
-			try {
-				MyGraph.initEdges();
-			} catch (Exception e) {
-				System.out.println("Error");
-			}
+
+				try {
+					MyGraph.initEdges();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
 		}
 	}
 }

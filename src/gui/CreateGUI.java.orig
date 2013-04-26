@@ -1,6 +1,5 @@
 package gui;
 
-import graph.MyEdge;
 import graph.QuadTree;
 
 import java.awt.*;
@@ -9,10 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 import javax.swing.*;
 
@@ -24,7 +19,6 @@ public class CreateGUI {
 	private static CreateGUI instance = null; //Used for the Singleton pattern
 	private buttonActionListener bal = new buttonActionListener();
 	private static GuiMethods guiM;
-	private DrawGraph dg;
 	
 	// JPanels
 	JPanel leftPanel = new JPanel();
@@ -114,7 +108,7 @@ public class CreateGUI {
 		double tempHeight = height/1.2;
 		
 		//Adds the map as a JComponent
-		dg = DrawGraph.getInstance(qt, (int) tempWidth, (int) tempHeight);
+		JComponent dg = DrawGraph.getInstance(qt, (int) tempWidth, (int) tempHeight);
 		dg.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		addLogoPanel();
@@ -295,25 +289,6 @@ public class CreateGUI {
 	    }
 	}
 	
-	public void showPossibleEdges(HashMap<String, MyEdge> edges, boolean from) {
-
-		for (Entry<String, MyEdge> entry : edges.entrySet()) {
-			if (JOptionPane.showConfirmDialog(null, entry.getKey(), "Is this the road you are looking for?", 
-				    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-				    == JOptionPane.YES_OPTION)
-				{
-				if(from) GuiMethods.nodeFromKDV = entry.getValue().getFromNode().getKDV();
-				else {
-					GuiMethods.nodeToKDV = entry.getValue().getFromNode().getKDV();
-					guiM.searchForPath();
-				}
-				break;
-				}
-
-			//System.out.println(entry.getKey());
-		}
-	}
-	
 	private class buttonActionListener implements ActionListener {
 	
 		public void actionPerformed(ActionEvent e) {
@@ -326,19 +301,19 @@ public class CreateGUI {
 				System.out.println("Search from " + getTextFromTextField(from) + " to " + getTextFromTextField(to));
 				guiM.createPath(getTextFromTextField(from), getTextFromTextField(to));
 			} else if(e.getSource() == zoomIn_btn){
-				dg.zoomIn();
+				System.out.println("Zoom in++++");
 			} else if(e.getSource() == zoomOut_btn){
-				dg.zoomOut();
+				guiM.zoomOut();
 			} else if(e.getSource() == reset_btn){
-				dg.resetMap();
+				System.out.println("Reset the map!");
 			} else if(e.getSource() == arrowUp_btn){
-				dg.pan(1);
+				System.out.println("Pan upwards");
 			} else if(e.getSource() == arrowDown_btn){
-				dg.pan(2);
+				System.out.println("Pan downwards");
 			} else if(e.getSource() == arrowLeft_btn){
-				dg.pan(3);
+				System.out.println("Pan Left!");
 			} else if(e.getSource() == arrowRight_btn){
-				dg.pan(4);
+				System.out.println("Pan right");
 			}
 			
 		}
